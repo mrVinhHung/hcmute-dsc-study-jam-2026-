@@ -1,0 +1,6 @@
+{
+  "name": "CODE TOÀN BUG — HCM-UTE DSC | Git & GitHub Study Jam 2026",
+  "description": "Website giới thiệu nhóm CODE TOÀN BUG tham gia chương trình GIT & GITHUB STUDY JAM 2026 của HCM-UTE DSC.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

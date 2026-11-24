@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CODE TOÀN BUG — HCM-UTE DSC | GIT &amp; GITHUB STUDY JAM 2026</title>
+  <meta name="description" content="Website giới thiệu nhóm CODE TOÀN BUG tham gia chương trình GIT & GITHUB STUDY JAM 2026 của HCM-UTE DSC. Đó không phải là bug, đó là tính năng." />
+  <meta property="og:title" content="CODE TOÀN BUG — HCM-UTE DSC | GIT & GITHUB STUDY JAM 2026" />
+  <meta property="og:description" content="Đó không phải là bug, đó là tính năng. Đội thi tham gia GIT & GITHUB STUDY JAM 2026 của HCM-UTE DSC." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#090B10" />
+
+  <!-- Google Fonts: Plus Jakarta Sans (Display & Body) + JetBrains Mono (Code & Terminal) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    /* ==========================================================================
+       1. DESIGN TOKENS & BASE RESET
+       ========================================================================== */
+    :root {
+      --bg-canvas: #090B10;
+      --bg-surface: #10141E;
+      --bg-surface-elevated: #151B28;
+      --bg-glass: rgba(16, 20, 30, 0.72);
+
+      --accent-blue: #3B82F6;
+      --accent-blue-soft: rgba(59, 130, 246, 0.14);
+      --accent-blue-glow: rgba(59, 130, 246, 0.28);
+      --accent-gold: #D6B56D;
+      --accent-gold-soft: rgba(214, 181, 109, 0.14);
+      --accent-gold-glow: rgba(214, 181, 109, 0.28);
+
+      --text-primary: #F3F6FC;
+      --text-secondary: #A6B2C8;
+      --text-muted: #71809B;
+
+      --border-hairline: rgba(255, 255, 255, 0.08);
+      --border-gold: rgba(214, 181, 109, 0.45);
+      --border-blue: rgba(59, 130, 246, 0.35);
+
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+
+      --container-max: 1180px;
+      --header-height: 70px;
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      line-height: 1.65;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Subtle dark-tech grid & ambient radial lighting */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 15% 18%, rgba(59, 130, 246, 0.10), transparent 42%),
+        radial-gradient(circle at 85% 22%, rgba(214, 181, 109, 0.08), transparent 38%),
+        radial-gradient(circle at 50% 85%, rgba(59, 130, 246, 0.06), transparent 48%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.25) 75%, transparent 100%);
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-inline: auto;
+      padding-inline: 24px;
+    }
+
+    /* ==========================================================================
+       2. STICKY HEADER & NAVIGATION
+       ========================================================================== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: var(--header-height);
+      background: rgba(9, 11, 16, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .header-inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+    }
+
+    /* Brand lockup on the left */
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity 180ms var(--ease-out-expo);
+    }
+
+    .brand-link:hover {
+      opacity: 0.88;
+    }
+
+    .brand-logo-slot {
+      height: 34px;
+      padding: 0 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(214, 181, 109, 0.14));
+      border: 1px dashed rgba(214, 181, 109, 0.48);
+      color: var(--accent-gold);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    /* Desktop navigation tabs on the right */
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-tab {
+      position: relative;
+      padding: 8px 4px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: color 180ms var(--ease-out-expo);
+    }
+
+    .nav-tab::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -2px;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold));
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 200ms var(--ease-out-expo);
+    }
+
+    .nav-tab:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-tab:hover::after {
+      transform: scaleX(0.6);
+    }
+
+    .nav-tab.is-active {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .nav-tab.is-active::after {
+      transform: scaleX(1);
+    }
+
+    /* Mobile hamburger button */
+    .mobile-menu-btn {
+      display: none;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-hairline);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      transition: border-color 180ms ease, background-color 180ms ease;
+    }
+
+    .mobile-menu-btn:hover {
+      border-color: var(--border-blue);
+      background: var(--bg-surface-elevated);
+    }
+
+    /* Mobile navigation drawer */
+    .mobile-nav-drawer {
+      display: none;
+      position: fixed;
+      top: var(--header-height);
+      left: 0;
+      right: 0;
+      z-index: 49;
+      background: rgba(11, 14, 21, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-hairline);
+      padding: 16px 24px 24px;
+      flex-direction: column;
+      gap: 8px;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 180ms var(--ease-out-expo), transform 180ms var(--ease-out-expo);
+    }
+
+    .mobile-nav-drawer.is-open {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .mobile-nav-tab {
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+    }
+
+    .mobile-nav-tab:hover {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+    }
+
+    .mobile-nav-tab.is-active {
+      background: rgba(59, 130, 246, 0.10);
+      border-color: var(--border-blue);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       3. PAGE VIEW SWITCHER & TRANSITIONS
+       ========================================================================== */
+    main {
+      flex: 1;
+      width: 100%;
+    }
+
+    .view-panel {
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .view-panel.is-active {
+      display: block;
+      animation: viewEnter 260ms var(--ease-out-expo) forwards;
+    }
+
+    @keyframes viewEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ==========================================================================
+       4. HERO SECTION
+       ========================================================================== */
+    .hero-section {
+      position: relative;
+      padding: 64px 0 72px;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.12fr 0.88fr;
+      align-items: center;
+      gap: 56px;
+    }
+
+    /* Subtle developer decorative braces in background without obscuring text */
+    .hero-code-motif {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      letter-spacing: 0.01em;
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(214, 181, 109, 0.28);
+      background: rgba(214, 181, 109, 0.06);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent-gold);
+      letter-spacing: 0.04em;
+      margin-bottom: 22px;
+    }
+
+    .hero-kicker i {
+      color: var(--accent-blue);
+      font-size: 0.85rem;
+    }
+
+    .hero-title {
+      font-size: clamp(2.15rem, 4.1vw, 3.45rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+      text-wrap: balance;
+      margin-bottom: 10px;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-mono);
+      font-size: clamp(1rem, 1.75vw, 1.25rem);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--accent-blue);
+      margin-bottom: 18px;
+    }
+
+    .hero-team-name {
+      display: block;
+      font-size: clamp(2rem, 3.8vw, 3.1rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      background: linear-gradient(120deg, #F3DEAA 0%, #D6B56D 48%, #9DC2FF 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-team-brackets {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--accent-blue);
+      opacity: 0.85;
+      margin-inline: 2px;
+    }
+
+    .hero-slogan-line {
+      font-size: clamp(1.06rem, 1.5vw, 1.25rem);
+      font-weight: 500;
+      color: var(--text-secondary);
+      max-width: 54ch;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hero-slogan-quote {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .hero-meta-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .hero-meta-strip .sep {
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 13px 26px;
+      border-radius: 10px;
+      background: var(--accent-blue);
+      color: #FFFFFF;
+      font-size: 0.95rem;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 8px 24px -6px rgba(59, 130, 246, 0.48);
+      transition: transform 180ms var(--ease-out-expo), background-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .btn-primary:hover {
+      background: #2563EB;
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px -6px rgba(59, 130, 246, 0.58);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 13px 22px;
+      border-radius: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-primary);
+      font-size: 0.94rem;
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--border-gold);
+      background: var(--bg-surface-elevated);
+      color: var(--accent-gold);
+    }
+
+    /* Right column: Team Emblem Badge Frame */
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      animation: heroVisualFade 600ms var(--ease-out-expo) both;
+    }
+
+    @keyframes heroVisualFade {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .badge-frame-outer {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      aspect-ratio: 3 / 2;
+      padding: 14px;
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(214, 181, 109, 0.38), rgba(59, 130, 246, 0.28) 55%, rgba(255, 255, 255, 0.08));
+      box-shadow:
+        0 24px 60px -16px rgba(0, 0, 0, 0.72),
+        0 0 48px -12px rgba(59, 130, 246, 0.26),
+        0 0 36px -14px rgba(214, 181, 109, 0.18);
+      transition: transform 280ms var(--ease-out-expo), box-shadow 280ms var(--ease-out-expo);
+    }
+
+    .badge-frame-outer:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 28px 70px -16px rgba(0, 0, 0, 0.78),
+        0 0 60px -10px rgba(59, 130, 246, 0.34),
+        0 0 44px -12px rgba(214, 181, 109, 0.25);
+    }
+
+    .badge-frame-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      background-color: #0B0D12;
+      border: 1px solid rgba(214, 181, 109, 0.28);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 6px;
+    }
+
+    .badge-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Hiển thị toàn bộ ảnh, không crop và không méo hình */
+      border-radius: 10px;
+    }
+
+    .badge-fallback {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 14px;
+      padding: 28px;
+      color: var(--text-secondary);
+    }
+
+    .badge-fallback.is-visible {
+      display: flex;
+    }
+
+    .badge-fallback-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--accent-gold);
+      background: rgba(59, 130, 246, 0.12);
+      color: var(--accent-gold);
+      font-size: 1.8rem;
+    }
+
+    /* ==========================================================================
+       5. WHO WE ARE SECTION (TEAM INTRODUCTION)
+       ========================================================================== */
+    .section-block {
+      padding: 48px 0 64px;
+    }
+
+    .about-card {
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 44px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border-hairline);
+      margin-bottom: 32px;
+    }
+
+    .section-kicker {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .section-title {
+      font-size: clamp(1.65rem, 2.8vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .about-branch-tag {
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      color: var(--accent-gold);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .about-lead {
+      font-size: 1.08rem;
+      line-height: 1.75;
+      color: var(--text-secondary);
+      max-width: 72ch;
+      margin-bottom: 36px;
+    }
+
+    .about-lead strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Clean 3-column grid separated by subtle hairlines, avoiding nested cards */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-top: 1px solid var(--border-hairline);
+      padding-top: 32px;
+    }
+
+    .pillar-item {
+      padding-right: 28px;
+    }
+
+    .pillar-item + .pillar-item {
+      padding-left: 28px;
+      border-left: 1px solid var(--border-hairline);
+    }
+
+    .pillar-index {
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--accent-gold);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .pillar-title {
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .pillar-desc {
+      font-size: 0.94rem;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+
+    /* ==========================================================================
+       6. SLOGAN TERMINAL SECTION
+       ========================================================================== */
+    .slogan-section {
+      padding: 16px 0 88px;
+    }
+
+    .terminal-window {
+      background: #0B0E16;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.78);
+    }
+
+    .terminal-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 22px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-hairline);
+      flex-wrap: wrap;
+    }
+
+    .terminal-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+    }
+
+    .terminal-label i {
+      color: var(--accent-gold);
+    }
+
+    .terminal-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .terminal-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-hairline);
+      background: rgba(255, 255, 255, 0.03);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
+    }
+
+    .terminal-btn:hover {
+      border-color: var(--border-blue);
+      color: var(--text-primary);
+      background: rgba(59, 130, 246, 0.10);
+    }
+
+    .terminal-btn.is-copied {
+      border-color: var(--border-gold);
+      color: var(--accent-gold);
+      background: var(--accent-gold-soft);
+    }
+
+    .terminal-body {
+      padding: 36px 32px;
+      font-family: var(--font-mono);
+    }
+
+    .terminal-cmd-line {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .terminal-prompt {
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .terminal-cmd {
+      color: var(--text-secondary);
+    }
+
+    .terminal-slogan-output {
+      font-family: var(--font-sans);
+      font-size: clamp(1.5rem, 3vw, 2.35rem);
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
+      padding: 20px 0;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+      margin-bottom: 18px;
+      text-wrap: balance;
+    }
+
+    .terminal-slogan-output .quote-mark {
+      color: var(--accent-gold);
+      font-family: var(--font-mono);
+    }
+
+    .terminal-suboutput {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .terminal-suboutput .highlight-gold {
+      color: var(--accent-gold);
+    }
+
+    /* ==========================================================================
+       7. SECONDARY VIEWS (VỀ CHÚNG TÔI & LIÊN HỆ PLACEHOLDERS)
+       ========================================================================== */
+    .placeholder-section {
+      padding: 72px 0 96px;
+    }
+
+    .placeholder-card {
+      max-width: 720px;
+      margin-inline: auto;
+      padding: 56px 40px;
+      text-align: center;
+      border-radius: var(--radius-lg);
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-hairline);
+    }
+
+    .placeholder-icon-wrap {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 24px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, rgba(59, 130, 246, 0.15), rgba(214, 181, 109, 0.14));
+      border: 1px solid var(--border-gold);
+      color: var(--accent-gold);
+      font-size: 1.5rem;
+    }
+
+    .placeholder-kicker {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent-blue);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .placeholder-title {
+      font-size: clamp(1.75rem, 3vw, 2.35rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .placeholder-status {
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--accent-gold);
+      margin-bottom: 14px;
+    }
+
+    .placeholder-desc {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 50ch;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+    }
+
+    .placeholder-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    /* ==========================================================================
+       8. FOOTER
+       ========================================================================== */
+    .site-footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border-hairline);
+      background: rgba(9, 11, 16, 0.9);
+      padding: 32px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-identity {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .footer-identity strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .footer-identity .gold {
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+
+    .footer-identity .sep {
+      color: var(--text-muted);
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      transition: color 160ms ease;
+    }
+
+    .footer-link:hover,
+    .footer-link.is-active {
+      color: var(--text-primary);
+    }
+
+    .scroll-top-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-hairline);
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      transition: border-color 160ms ease, color 160ms ease;
+    }
+
+    .scroll-top-btn:hover {
+      border-color: var(--border-blue);
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       9. RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 960px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 44px;
+      }
+
+      .hero-visual {
+        order: -1;
+      }
+
+      .badge-frame-outer {
+        max-width: 420px;
+      }
+
+      .pillars-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+
+      .pillar-item {
+        padding-right: 0;
+      }
+
+      .pillar-item + .pillar-item {
+        padding-left: 0;
+        padding-top: 28px;
+        border-left: none;
+        border-top: 1px solid var(--border-hairline);
+      }
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --header-height: 64px;
+      }
+
+      .desktop-nav {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: inline-flex;
+      }
+
+      .hero-section {
+        padding: 40px 0 48px;
+      }
+
+      .about-card {
+        padding: 28px 22px;
+      }
+
+      .terminal-body {
+        padding: 24px 20px;
+      }
+
+      .placeholder-card {
+        padding: 40px 22px;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* Respect reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       HEADER / STICKY NAVBAR
+       ======================================================================== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <!-- Khu vực nhận diện CLB HCM-UTE DSC bên trái (chờ bổ sung file logo chính thức) -->
+      <a href="#home" class="brand-link" data-tab-target="home" aria-label="HCM-UTE DSC - Về trang chủ">
+        <!-- Vị trí đặt logo chính thức của CLB HCM-UTE DSC (ví dụ: <img src="assets/dsc-logo.png" alt="Logo HCM-UTE DSC">) -->
+        <span class="brand-logo-slot" title="Logo CLB HCM-UTE DSC (chờ bổ sung file logo chính thức)" aria-hidden="true">
+          DSC
+        </span>
+        <span>HCM-UTE DSC</span>
+      </a>
+
+      <!-- 3 Tab điều hướng bên phải (Desktop) -->
+      <nav class="desktop-nav" aria-label="Điều hướng chính">
+        <button type="button" class="nav-tab is-active" data-tab-target="home" aria-current="page">
+          Trang chủ
+        </button>
+        <button type="button" class="nav-tab" data-tab-target="about">
+          Về chúng tôi
+        </button>
+        <button type="button" class="nav-tab" data-tab-target="contact">
+          Liên hệ
+        </button>
+      </nav>
+
+      <!-- Nút Hamburger (Mobile) -->
+      <button
+        type="button"
+        id="mobileMenuToggle"
+        class="mobile-menu-btn"
+        aria-label="Mở menu điều hướng"
+        aria-expanded="false"
+        aria-controls="mobileNavDrawer"
+      >
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Drawer -->
+  <nav id="mobileNavDrawer" class="mobile-nav-drawer" aria-label="Điều hướng di động">
+    <button type="button" class="mobile-nav-tab is-active" data-tab-target="home">
+      <span>Trang chủ</span>
+      <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+    </button>
+    <button type="button" class="mobile-nav-tab" data-tab-target="about">
+      <span>Về chúng tôi</span>
+      <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+    </button>
+    <button type="button" class="mobile-nav-tab" data-tab-target="contact">
+      <span>Liên hệ</span>
+      <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+    </button>
+  </nav>
+
+  <!-- ========================================================================
+       MAIN CONTENT (3 TABS: HOME / ABOUT / CONTACT)
+       ======================================================================== -->
+  <main>
+
+    <!-- ======================================================================
+         TAB 1: TRANG CHỦ
+         ====================================================================== -->
+    <section id="view-home" class="view-panel is-active" aria-labelledby="hero-heading">
+
+      <!-- HERO SECTION -->
+      <div class="hero-section">
+        <div class="container hero-grid">
+
+          <!-- Cột trái: Nội dung chính -->
+          <div class="hero-content">
+            <div class="hero-code-motif" aria-hidden="true">
+              <span><i class="fa-solid fa-code-branch"></i> main</span>
+              <span>{ team: "code-toan-bug" }</span>
+            </div>
+
+            <div class="hero-kicker">
+              <i class="fa-solid fa-terminal" aria-hidden="true"></i>
+              <span>HCM-UTE DSC | GIT &amp; GITHUB STUDY JAM 2026</span>
+            </div>
+
+            <h1 id="hero-heading" class="hero-title">
+              GIT &amp; GITHUB STUDY JAM
+            </h1>
+
+            <p class="hero-subtitle">HCM-UTE DSC 2026</p>
+
+            <span class="hero-team-name">
+              <span class="hero-team-brackets" aria-hidden="true">{</span>
+              CODE TOÀN BUG
+              <span class="hero-team-brackets" aria-hidden="true">}</span>
+            </span>
+
+            <p class="hero-slogan-line">
+              <span class="hero-slogan-quote">"Đó không phải là bug, đó là tính năng"</span>
+            </p>
+
+            <div class="hero-meta-strip">
+              <span>Git Workflow</span>
+              <span class="sep" aria-hidden="true">·</span>
+              <span>Open Source Collaboration</span>
+              <span class="sep" aria-hidden="true">·</span>
+              <span>Developer Culture</span>
+            </div>
+
+            <div class="hero-actions">
+              <button type="button" id="exploreTeamBtn" class="btn-primary">
+                <i class="fa-solid fa-code" aria-hidden="true"></i>
+                <span>Khám phá nhóm</span>
+              </button>
+              <button type="button" id="jumpSloganBtn" class="btn-secondary">
+                <i class="fa-solid fa-terminal" aria-hidden="true"></i>
+                <span>Xem tuyên ngôn Terminal</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cột phải: Huy hiệu nhận diện nhóm (assets/team.png) -->
+          <div class="hero-visual">
+            <div class="badge-frame-outer">
+              <div class="badge-frame-inner">
+                <img
+                  id="teamBadgeImg"
+                  src="assets/team.png"
+                  alt="Mascot Chiikawa chính thức của nhóm CODE TOÀN BUG — HCM-UTE DSC Git & GitHub Study Jam 2026"
+                  class="badge-image"
+                  loading="eager"
+                />
+                <!-- Fallback an toàn nếu file ảnh chưa tồn tại -->
+                <div id="teamBadgeFallback" class="badge-fallback" aria-hidden="true">
+                  <div class="badge-fallback-icon">
+                    <i class="fa-solid fa-bug"></i>
+                  </div>
+                  <div>
+                    <strong style="color: #F3F6FC; display: block; margin-bottom: 4px;">CODE TOÀN BUG</strong>
+                    <span style="font-size: 0.85rem;">Đặt ảnh nhận diện tại <code>assets/team.png</code></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION GIỚI THIỆU NHÓM: WHO WE ARE? -->
+      <div id="who-we-are" class="section-block">
+        <div class="container">
+          <article class="about-card">
+            <header class="about-header">
+              <div>
+                <span class="section-kicker">Giới thiệu đội thi</span>
+                <h2 class="section-title">WHO WE ARE?</h2>
+              </div>
+              <span class="about-branch-tag">
+                <i class="fa-brands fa-git-alt" aria-hidden="true"></i>
+                <span>branch: study-jam-2026</span>
+              </span>
+            </header>
+
+            <p class="about-lead">
+              <strong>CODE TOÀN BUG</strong> là tập hợp những bạn trẻ đam mê lập trình cùng hội tụ tại chương trình
+              <strong>GIT &amp; GITHUB STUDY JAM 2026</strong> do <strong>HCM-UTE DSC</strong> tổ chức.
+              Chúng mình tin rằng mỗi dòng code viết ra — dù hoàn hảo hay còn vấp váp — đều là một commit đáng giá trên hành trình trưởng thành cùng công nghệ.
+              Với tinh thần học hỏi không ngừng, phối hợp teamwork chặt chẽ và không ngại đối mặt với những xung đột (conflict) hay lỗi phát sinh,
+              cả nhóm luôn sẵn sàng cùng nhau debug mọi vấn đề và chinh phục trọn vẹn từng thử thách của chương trình.
+            </p>
+
+            <div class="pillars-grid">
+              <div class="pillar-item">
+                <span class="pillar-index">01. Tinh thần học hỏi</span>
+                <h3 class="pillar-title">Làm chủ quy trình Git chuẩn mực</h3>
+                <p class="pillar-desc">
+                  Thực hành bài bản từ quản lý nhánh, viết commit rõ ràng đến review code chuyên nghiệp trong môi trường thực tế.
+                </p>
+              </div>
+
+              <div class="pillar-item">
+                <span class="pillar-index">02. Sức mạnh Teamwork</span>
+                <h3 class="pillar-title">Đồng bộ nhịp nhàng qua từng Pull Request</h3>
+                <p class="pillar-desc">
+                  Lắng nghe, hỗ trợ lẫn nhau và cùng giải quyết mọi merge conflict để hướng tới sản phẩm chung chất lượng nhất.
+                </p>
+              </div>
+
+              <div class="pillar-item">
+                <span class="pillar-index">03. Chinh phục thử thách</span>
+                <h3 class="pillar-title">Biến áp lực thành động lực sáng tạo</h3>
+                <p class="pillar-desc">
+                  Giữ vững sự hài hước của dân lập trình, kiên trì gỡ rối từng bài toán khó và hoàn thiện tư duy kỹ sư phần mềm.
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- SECTION SLOGAN: TERMINAL / CODE BLOCK -->
+      <div id="slogan-terminal" class="slogan-section">
+        <div class="container">
+          <div class="terminal-window">
+            <div class="terminal-topbar">
+              <div class="terminal-label">
+                <i class="fa-solid fa-terminal" aria-hidden="true"></i>
+                <span>code-toan-bug — bash — slogan.sh</span>
+              </div>
+              <div class="terminal-controls">
+                <button type="button" id="replayTerminalBtn" class="terminal-btn">
+                  <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                  <span>Chạy lại</span>
+                </button>
+                <button type="button" id="copySloganBtn" class="terminal-btn">
+                  <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                  <span>Sao chép slogan</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="terminal-body">
+              <div class="terminal-cmd-line">
+                <span class="terminal-prompt">dev@hcm-ute-dsc:~/study-jam-2026$</span>
+                <span class="terminal-cmd" id="terminalCmdText">git commit -m "feature: declare team philosophy"</span>
+              </div>
+
+              <blockquote class="terminal-slogan-output" id="terminalSloganOutput">
+                <span class="quote-mark">"</span>Đó không phải là bug, đó là tính năng<span class="quote-mark">"</span>
+              </blockquote>
+
+              <div class="terminal-suboutput">
+                <span>output: <span class="highlight-gold">CODE TOÀN BUG</span> · GIT &amp; GITHUB STUDY JAM 2026</span>
+                <span id="terminalFeedback">Sẵn sàng đồng bộ lên remote origin/main</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================================
+         TAB 2: VỀ CHÚNG TÔI (COMING SOON PLACEHOLDER)
+         ====================================================================== -->
+    <section id="view-about" class="view-panel" aria-labelledby="about-placeholder-title" hidden>
+      <div class="container placeholder-section">
+        <div class="placeholder-card">
+          <div class="placeholder-icon-wrap" aria-hidden="true">
+            <i class="fa-solid fa-users-gear"></i>
+          </div>
+          <span class="placeholder-kicker">CODE TOÀN BUG · VỀ CHÚNG TÔI</span>
+          <h2 id="about-placeholder-title" class="placeholder-title">Hồ sơ đội thi &amp; Hành trình Study Jam</h2>
+          <p class="placeholder-status">Coming Soon...</p>
+          <p class="placeholder-desc">
+            Nội dung sẽ được cập nhật. Thông tin chi tiết về các thành viên, phân công vai trò và nhật ký đóng góp của nhóm CODE TOÀN BUG đang trong quá trình hoàn thiện.
+          </p>
+          <div class="placeholder-actions">
+            <button type="button" class="btn-primary" data-tab-target="home">
+              <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+              <span>Quay lại Trang chủ</span>
+            </button>
+            <button type="button" class="btn-secondary" data-tab-target="contact">
+              <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+              <span>Chuyển sang Liên hệ</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         TAB 3: LIÊN HỆ (COMING SOON PLACEHOLDER)
+         ====================================================================== -->
+    <section id="view-contact" class="view-panel" aria-labelledby="contact-placeholder-title" hidden>
+      <div class="container placeholder-section">
+        <div class="placeholder-card">
+          <div class="placeholder-icon-wrap" aria-hidden="true">
+            <i class="fa-solid fa-code-pull-request"></i>
+          </div>
+          <span class="placeholder-kicker">HCM-UTE DSC · KẾT NỐI CÙNG NHÓM</span>
+          <h2 id="contact-placeholder-title" class="placeholder-title">Kênh liên hệ &amp; GitHub Repository</h2>
+          <p class="placeholder-status">Nội dung sẽ được cập nhật</p>
+          <p class="placeholder-desc">
+            Coming Soon... Liên kết kho mã nguồn, kênh trao đổi và thông tin kết nối chính thức của nhóm CODE TOÀN BUG tại GIT &amp; GITHUB STUDY JAM 2026 sẽ sớm được mở tại đây.
+          </p>
+          <div class="placeholder-actions">
+            <button type="button" class="btn-primary" data-tab-target="home">
+              <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+              <span>Quay lại Trang chủ</span>
+            </button>
+            <button type="button" class="btn-secondary" data-tab-target="about">
+              <i class="fa-regular fa-id-card" aria-hidden="true"></i>
+              <span>Xem Về chúng tôi</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       FOOTER
+       ======================================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-identity">
+        <strong>HCM-UTE DSC</strong>
+        <span class="sep" aria-hidden="true">·</span>
+        <span class="gold">CODE TOÀN BUG</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span>GIT &amp; GITHUB STUDY JAM 2026</span>
+      </div>
+
+      <div class="footer-links">
+        <button type="button" class="footer-link is-active" data-tab-target="home">Trang chủ</button>
+        <button type="button" class="footer-link" data-tab-target="about">Về chúng tôi</button>
+        <button type="button" class="footer-link" data-tab-target="contact">Liên hệ</button>
+        <button type="button" id="scrollTopBtn" class="scroll-top-btn" aria-label="Cuộn lên đầu trang">
+          <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+          <span>Đầu trang</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       JAVASCRIPT THUẦN (TAB NAVIGATION, MOBILE MENU, TERMINAL INTERACTION)
+       ======================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      const SLOGAN_TEXT = 'Đó không phải là bug, đó là tính năng';
+      const VALID_TABS = ['home', 'about', 'contact'];
+
+      const viewPanels = {
+        home: document.getElementById('view-home'),
+        about: document.getElementById('view-about'),
+        contact: document.getElementById('view-contact')
+      };
+
+      const tabTriggerButtons = document.querySelectorAll('[data-tab-target]');
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+      const exploreTeamBtn = document.getElementById('exploreTeamBtn');
+      const jumpSloganBtn = document.getElementById('jumpSloganBtn');
+      const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+      const teamBadgeImg = document.getElementById('teamBadgeImg');
+      const teamBadgeFallback = document.getElementById('teamBadgeFallback');
+
+      const replayTerminalBtn = document.getElementById('replayTerminalBtn');
+      const copySloganBtn = document.getElementById('copySloganBtn');
+      const terminalCmdText = document.getElementById('terminalCmdText');
+      const terminalFeedback = document.getElementById('terminalFeedback');
+
+      /* ----------------------------------------------------------------------
+         1. Điều hướng giữa 3 tab (Trang chủ, Về chúng tôi, Liên hệ)
+         ---------------------------------------------------------------------- */
+      function setMobileMenuState(isOpen) {
+        if (!mobileNavDrawer || !mobileMenuToggle) return;
+        mobileNavDrawer.classList.toggle('is-open', isOpen);
+        mobileMenuToggle.setAttribute('aria-expanded', String(isOpen));
+        const icon = mobileMenuToggle.querySelector('i');
+        if (icon) {
+          icon.className = isOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+        }
+      }
+
+      function switchTab(targetTab, options) {
+        const opts = options || { updateHash: true, scrollToTop: true };
+        const safeTab = VALID_TABS.includes(targetTab) ? targetTab : 'home';
+
+        // Cập nhật trạng thái hiển thị các view
+        Object.keys(viewPanels).forEach(function (key) {
+          const panel = viewPanels[key];
+          if (!panel) return;
+          const isCurrent = key === safeTab;
+          panel.classList.toggle('is-active', isCurrent);
+          panel.hidden = !isCurrent;
+        });
+
+        // Cập nhật active state cho tất cả nút điều hướng (Header, Mobile Drawer, Footer)
+        tabTriggerButtons.forEach(function (btn) {
+          const isTarget = btn.getAttribute('data-tab-target') === safeTab;
+          if (btn.classList.contains('nav-tab') || btn.classList.contains('mobile-nav-tab') || btn.classList.contains('footer-link')) {
+            btn.classList.toggle('is-active', isTarget);
+            if (isTarget) {
+              btn.setAttribute('aria-current', 'page');
+            } else {
+              btn.removeAttribute('aria-current');
+            }
+          }
+        });
+
+        // Đóng menu mobile sau khi chọn tab
+        setMobileMenuState(false);
+
+        if (opts.updateHash && window.location.hash !== '#' + safeTab) {
+          try {
+            history.replaceState(null, '', '#' + safeTab);
+          } catch (err) {
+            window.location.hash = safeTab;
+          }
+        }
+
+        if (opts.scrollToTop) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+
+      tabTriggerButtons.forEach(function (btn) {
+        btn.addEventListener('click', function (event) {
+          const target = btn.getAttribute('data-tab-target');
+          if (!target) return;
+          if (btn.tagName === 'A') {
+            event.preventDefault();
+          }
+          switchTab(target, { updateHash: true, scrollToTop: true });
+        });
+      });
+
+      // Đồng bộ tab khi người dùng dùng nút Back/Forward hoặc hash URL
+      function syncTabFromHash() {
+        const hash = window.location.hash.replace('#', '');
+        if (VALID_TABS.includes(hash)) {
+          switchTab(hash, { updateHash: false, scrollToTop: false });
+        } else {
+          switchTab('home', { updateHash: false, scrollToTop: false });
+        }
+      }
+
+      window.addEventListener('hashchange', syncTabFromHash);
+      syncTabFromHash();
+
+      /* ----------------------------------------------------------------------
+         2. Menu Hamburger trên thiết bị di động
+         ---------------------------------------------------------------------- */
+      if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', function () {
+          const isCurrentlyOpen = mobileNavDrawer.classList.contains('is-open');
+          setMobileMenuState(!isCurrentlyOpen);
+        });
+      }
+
+      // Đóng menu khi nhấn phím Escape hoặc resize lên desktop
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          setMobileMenuState(false);
+        }
+      });
+
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 720) {
+          setMobileMenuState(false);
+        }
+      });
+
+      /* ----------------------------------------------------------------------
+         3. Nút hành động trên Hero & Footer
+         ---------------------------------------------------------------------- */
+      if (exploreTeamBtn) {
+        exploreTeamBtn.addEventListener('click', function () {
+          const whoWeAreEl = document.getElementById('who-we-are');
+          if (whoWeAreEl) {
+            whoWeAreEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      }
+
+      if (jumpSloganBtn) {
+        jumpSloganBtn.addEventListener('click', function () {
+          const sloganEl = document.getElementById('slogan-terminal');
+          if (sloganEl) {
+            sloganEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+      }
+
+      if (scrollTopBtn) {
+        scrollTopBtn.addEventListener('click', function () {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         4. Kiểm tra tải ảnh huy hiệu (Fallback an toàn)
+         ---------------------------------------------------------------------- */
+      if (teamBadgeImg && teamBadgeFallback) {
+        teamBadgeImg.addEventListener('error', function () {
+          teamBadgeImg.style.display = 'none';
+          teamBadgeFallback.classList.add('is-visible');
+          teamBadgeFallback.setAttribute('aria-hidden', 'false');
+        });
+      }
+
+      /* ----------------------------------------------------------------------
+         5. Tương tác Terminal Slogan (Chạy lại & Sao chép)
+         ---------------------------------------------------------------------- */
+      let typingTimer = null;
+
+      if (replayTerminalBtn && terminalCmdText && terminalFeedback) {
+        replayTerminalBtn.addEventListener('click', function () {
+          const fullCmd = 'git commit -m "feature: declare team philosophy"';
+          if (typingTimer) {
+            clearInterval(typingTimer);
+          }
+
+          terminalCmdText.textContent = '';
+          terminalFeedback.textContent = 'Đang thực thi lệnh Git...';
+
+          let charIndex = 0;
+          typingTimer = setInterval(function () {
+            charIndex += 1;
+            terminalCmdText.textContent = fullCmd.slice(0, charIndex);
+            if (charIndex >= fullCmd.length) {
+              clearInterval(typingTimer);
+              typingTimer = null;
+              terminalFeedback.textContent = 'Đã commit thành công lên nhánh main';
+            }
+          }, 22);
+        });
+      }
+
+      if (copySloganBtn && terminalFeedback) {
+        copySloganBtn.addEventListener('click', function () {
+          const btnSpan = copySloganBtn.querySelector('span');
+          const setCopiedFeedback = function () {
+            copySloganBtn.classList.add('is-copied');
+            if (btnSpan) btnSpan.textContent = 'Đã sao chép';
+            terminalFeedback.textContent = 'Đã sao chép slogan vào clipboard';
+            setTimeout(function () {
+              copySloganBtn.classList.remove('is-copied');
+              if (btnSpan) btnSpan.textContent = 'Sao chép slogan';
+              terminalFeedback.textContent = 'Sẵn sàng đồng bộ lên remote origin/main';
+            }, 2000);
+          };
+
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(SLOGAN_TEXT).then(setCopiedFeedback).catch(function () {
+              fallbackCopyText(SLOGAN_TEXT);
+              setCopiedFeedback();
+            });
+          } else {
+            fallbackCopyText(SLOGAN_TEXT);
+            setCopiedFeedback();
+          }
+        });
+      }
+
+      function fallbackCopyText(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          document.execCommand('copy');
+        } catch (err) {
+          // Bỏ qua nếu trình duyệt hạn chế
+        }
+        document.body.removeChild(textarea);
+      }
+    })();
+  </script>
+</body>
+</html>
